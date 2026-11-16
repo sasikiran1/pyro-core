@@ -209,8 +209,8 @@ No copyrighted images, audio or video are included. All screenshots in `docs/ima
 
 ## Links
 
-- **Live app:** _[add deployed URL]_
-- **Demo:** _[add video (30 s or less) or slide deck (7 slides or fewer) URL]_
+- **Live app:** https://sasikiran1.github.io/pyro-core/
+- **Demo (7 slides):** [docs/PYRO-CORE-demo-slides.pdf](docs/PYRO-CORE-demo-slides.pdf)
 - **Team:** Sasi Kiran Gottipati (solo team)
 
 ## Licence
