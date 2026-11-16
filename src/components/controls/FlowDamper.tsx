@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Fan, Flame, FlameKindling } from 'lucide-react'
+import { Fan, FlameKindling, PowerOff } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const MAX = 40
@@ -9,11 +9,11 @@ interface Props {
   onChange: (v: number) => void
   lit: boolean
   canIgnite: boolean
-  onIgnite: () => void
+  onToggleFlame: () => void
 }
 
 /** A vertical lever: drag the handle (or use arrow keys) to set duct airflow, 0 to 40 cm/s (the BASS-II fan range). */
-export function FlowDamper({ flowCmS, onChange, lit, canIgnite, onIgnite }: Props) {
+export function FlowDamper({ flowCmS, onChange, lit, canIgnite, onToggleFlame }: Props) {
   const track = useRef<HTMLDivElement>(null)
   const setFromY = (clientY: number) => {
     const r = track.current!.getBoundingClientRect()
@@ -81,16 +81,35 @@ export function FlowDamper({ flowCmS, onChange, lit, canIgnite, onIgnite }: Prop
             </div>
           </div>
           <button
-            onClick={onIgnite}
-            disabled={lit || !canIgnite}
+            onClick={onToggleFlame}
+            disabled={!lit && !canIgnite}
             className={clsx(
-              'mt-3 flex items-center justify-center gap-2 px-3 py-2 rounded border text-xs font-medium transition-colors',
-              lit ? 'border-amber-600/50 text-amber-400 bg-amber-500/10' : canIgnite ? 'border-thermal/60 text-thermal hover:bg-thermal/10' : 'border-edge text-slate-600',
+              'mt-3 flex items-center justify-center gap-2 px-3 py-2 rounded border text-xs font-medium transition-colors cursor-pointer',
+              lit
+                ? 'border-amber-500/70 text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                : canIgnite
+                  ? 'border-thermal/60 text-thermal hover:bg-thermal/10'
+                  : 'border-edge text-slate-600 cursor-not-allowed',
             )}
-            title={canIgnite ? 'Fire the hot-wire igniter' : 'The model predicts no sustained flame at these conditions'}
+            title={
+              lit
+                ? 'Click to extinguish the flame manually'
+                : canIgnite
+                  ? 'Fire the NASA hot-wire igniter coil to start combustion'
+                  : 'The cabin atmosphere cannot sustain a flame (adjust O2, pressure, or flow)'
+            }
           >
-            {lit ? <Flame size={14} /> : <FlameKindling size={14} />}
-            {lit ? 'Burning' : canIgnite ? 'Fire igniter' : 'Would not sustain'}
+            {lit ? (
+              <>
+                <PowerOff size={14} className="text-amber-400" />
+                <span>Extinguish flame</span>
+              </>
+            ) : (
+              <>
+                <FlameKindling size={14} />
+                <span>{canIgnite ? 'Fire igniter' : 'Would not sustain'}</span>
+              </>
+            )}
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Check, Download, FileText, Flame, Link2, Scale } from 'lucide-react'
+import { Check, Download, FileText, Flame, Link2, RotateCcw, Scale } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { EngineState } from '../../types/combustion'
 import { REGIME_STYLE } from '../analytics/PhaseNomogram'
@@ -10,10 +10,11 @@ interface Props {
   onCsv: () => void
   onCompare: () => void
   onShare: () => void
+  onReset: () => void
   copied: boolean
 }
 
-export function Header({ state, lit, onReport, onCsv, onCompare, onShare, copied }: Props) {
+export function Header({ state, lit, onReport, onCsv, onCompare, onShare, onReset, copied }: Props) {
   const status = lit ? REGIME_STYLE[state.regime].label : state.burning ? 'Can burn here: no flame lit' : REGIME_STYLE[state.regime].label
   return (
     <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5 border-b border-edge bg-deck">
@@ -29,6 +30,13 @@ export function Header({ state, lit, onReport, onCsv, onCompare, onShare, copied
         {status}
       </div>
       <div className="ml-auto flex flex-wrap gap-2">
+        <button
+          onClick={onReset}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-rose-500/60 bg-rose-950/20 text-xs text-rose-300 hover:bg-rose-900/40 transition-colors font-medium"
+          title="Reset cabin to standard ISS baseline (101.3 kPa, 21% O2, 1.5 cm/s, 0g, PMMA ignited)"
+        >
+          <RotateCcw size={13} /> Reset Cabin
+        </button>
         <button onClick={onCompare} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-warn/60 text-xs text-warn hover:bg-warn/10">
           <Scale size={13} /> ISS vs Artemis
         </button>

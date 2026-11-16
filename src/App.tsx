@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Info, Thermometer } from 'lucide-react'
+import { CircleSlash, Flame, Info, Thermometer, Zap } from 'lucide-react'
 import { MainLayout } from './components/layout/MainLayout'
 import { Header } from './components/layout/Header'
 import { AtmosphereModule } from './components/controls/AtmosphereModule'
@@ -55,6 +55,7 @@ export default function App() {
   const [scenario, setScenario] = useState<ScenarioId | null>(null)
   const [copied, setCopied] = useState(false)
   const [gravity, setGravity] = useState(0.0)
+  const [showCoil, setShowCoil] = useState(true)
   const scenarioTimer = useRef<number | null>(null)
 
   const material = materialById(materialId)
@@ -140,7 +141,10 @@ export default function App() {
     setX(START_ATM.xO2)
     setFlow(1.5)
     setGravity(0.0)
+    setMaterialId('pmma')
     setIgnited(true)
+    setOutAt(null)
+    setProbeAt(null)
   }, [])
 
   const shareLink = useCallback(async () => {
@@ -178,13 +182,21 @@ export default function App() {
   return (
     <>
       <MainLayout
-        header={<Header state={state} lit={lit} onReport={() => setReportOpen(true)} onCsv={exportCsv} onCompare={() => setCompareOpen(true)} onShare={shareLink} copied={copied} />}
+        header={<Header state={state} lit={lit} onReport={() => setReportOpen(true)} onCsv={exportCsv} onCompare={() => setCompareOpen(true)} onShare={shareLink} onReset={handleResetCabin} copied={copied} />}
         left={
           <>
             <AtmosphereModule pressureKPa={pressureKPa} xO2={xO2} onChange={(p, x) => { setP(p); setX(x) }} />
             <PlanetaryGravityModule gravity={gravity} onChange={setGravity} />
             <FlowDamper flowCmS={flowCmS} onChange={setFlow} lit={lit} canIgnite={state.burning}
-              onIgnite={() => { setIgnited(true); setOutAt(null) }} />
+              onToggleFlame={() => {
+                if (lit) {
+                  setIgnited(false)
+                  setOutAt(Date.now())
+                } else {
+                  setIgnited(true)
+                  setOutAt(null)
+                }
+              }} />
             <MaterialModule material={material} onChange={(id) => {
               // Light the new rod only if it can burn here, so no cool-down starts from a flame that never existed.
               setMaterialId(id)
@@ -218,21 +230,52 @@ export default function App() {
             <ScenarioBar onRun={runScenario} active={scenario} />
             <div className="card p-0 overflow-hidden relative h-[50vh] min-h-[340px]">
               <DuctViewport3D state={state} flowCmS={flowCmS} mode={mode} rodT={rodT} lit={lit} probe={probeAt}
-                onProbe={(x, y) => setProbeAt({ x, y })} gravity={gravity} />
-              <div className="absolute top-2 left-2"><SpectralToolbar mode={mode} onChange={setMode} /></div>
-              <div className="absolute top-2 right-2 hud text-[11px] text-slate-300 bg-deck/85 border border-edge/80 px-2.5 py-1 rounded backdrop-blur max-w-[270px] pointer-events-none text-right">
+                onProbe={(x, y) => setProbeAt({ x, y })} gravity={gravity} showCoil={showCoil} />
+              <div className="absolute top-2 left-2 flex items-center gap-2">
+                <SpectralToolbar mode={mode} onChange={setMode} />
+                <button
+                  type="button"
+                  onClick={() => setShowCoil((v) => !v)}
+                  className={`hud text-[11px] px-2.5 py-1 rounded border transition-colors flex items-center gap-1.5 backdrop-blur ${
+                    showCoil
+                      ? 'border-amber-500/60 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50'
+                      : 'border-edge bg-deck/80 text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="NASA BASS-II uses an electric Nichrome hot-wire coil around the fuel rod tip to initiate pyrolysis and ignition in zero-g. Click to toggle coil display."
+                >
+                  <Zap size={12} className={showCoil ? 'text-amber-400' : 'text-slate-500'} />
+                  <span>Igniter Coil: {showCoil ? 'ON' : 'OFF'}</span>
+                </button>
+              </div>
+              <div className="absolute top-2 right-2 hud text-[11px] text-slate-300 bg-deck/85 border border-edge/80 px-2.5 py-1.5 rounded backdrop-blur max-w-[280px] pointer-events-none text-right">
                 <div className="text-[10px] text-cyan-nasa font-semibold uppercase tracking-wider flex items-center justify-end gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-nasa animate-ping" />
-                  NASA BASS-II Specimen Rig
+                  NASA BASS-II Flow Duct
                 </div>
                 <div className="text-slate-100 font-medium">1.27 cm Solid Polymer Fuel Rod</div>
-                <div className="text-[10px] text-slate-400">Simulates spacecraft cable insulation & conduit</div>
+                <div className="text-[10px] text-amber-300/90 flex items-center justify-end gap-1 mt-0.5">
+                  <Zap size={10} /> Nichrome Hot-Wire Igniter Loop at Tip
+                </div>
+                <div className="text-[10px] text-slate-400 mt-0.5">Electric pulse heats coil to pyrolyze rod tip</div>
               </div>
               {lit && state.regime === 'blue' && mode === 'visible' && (
                 <button onClick={() => setMode('mwir')}
-                  className="absolute top-14 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded border border-thermal/70 bg-deck/90 text-thermal text-xs font-medium hover:bg-thermal/10 animate-pulse">
+                  className="absolute top-20 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded border border-thermal/70 bg-deck/90 text-thermal text-xs font-medium hover:bg-thermal/10 animate-pulse shadow-lg">
                   <Thermometer size={14} /> The rod is burning. Can you see it? Switch to thermal
                 </button>
+              )}
+              {!lit && state.burning && (
+                <button
+                  onClick={() => { setIgnited(true); setOutAt(null) }}
+                  className="absolute top-20 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded border border-amber-500/70 bg-deck/90 text-amber-300 text-xs font-medium hover:bg-amber-500/20 shadow-lg animate-pulse"
+                >
+                  <Flame size={14} className="text-amber-400" /> Atmosphere is flammable · Click to Ignite
+                </button>
+              )}
+              {!lit && !state.burning && (
+                <div className="absolute top-20 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded border border-rose-500/50 bg-deck/90 text-rose-300 text-xs font-medium backdrop-blur shadow-lg">
+                  <CircleSlash size={14} className="text-rose-400" /> Flame extinguished (outside limits)
+                </div>
               )}
               {mode === 'compare' && (
                 <>
@@ -258,7 +301,14 @@ export default function App() {
             <SIIntelligenceCard input={input} state={state} />
             <EvidencePanel material={material} pressureKPa={pressureKPa} xO2={xO2} />
             <section className="card text-[13px] text-slate-300 leading-relaxed">
-              <h2 className="panel-title mb-1.5"><Info size={13} /> Why fire is different in orbit</h2>
+              <h2 className="panel-title mb-1.5"><Info size={13} /> Hardware Rig &amp; The Igniter Coil</h2>
+              <p className="mb-2">
+                In NASA's <strong>BASS-II (Burning and Suppression of Solids - II)</strong> flight experiment on the ISS Microgravity Science Glovebox,
+                fuel rods (1.27 cm diameter) are mounted in the flow duct with a <strong>Nichrome hot-wire coil</strong> wrapped around the tip.
+                An electric current pulses through the wire loop to heat and pyrolyze the fuel until it catches fire. Once ignited, the current is turned off,
+                and the flame sustains solely via forced airflow from the duct fan. You can show or hide the coil using the toolbar button in the viewport.
+              </p>
+              <h3 className="text-slate-200 font-semibold text-[12px] uppercase tracking-wider mb-1">Why fire is different in orbit</h3>
               <p>
                 With no gravity there is no rising hot air, so a flame lives on whatever air the fans push past it. Too little flow and it starves
                 and radiates its heat away; too much and it blows off. In between, NASA found materials burn at <em>lower</em> oxygen than the

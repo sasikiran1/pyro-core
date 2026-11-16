@@ -23,6 +23,8 @@ interface Props {
   onProbe: (xMetres: number, yMetres: number) => void
   /** Gravity fraction (0 for microgravity, 0.16 Moon, 0.38 Mars, 1.0 Earth) */
   gravity?: number
+  /** Whether to show the hot-wire igniter coil loop (default true) */
+  showCoil?: boolean
 }
 
 const REGIME_LED: Record<string, number> = {
@@ -257,10 +259,13 @@ export function DuctViewport3D(p: Props) {
       u.uGravity.value = s.gravity ?? 0
       ledMat.color.setHex(s.lit ? REGIME_LED[s.state.regime] : 0x10b981)
 
+      const coilVisible = s.showCoil !== false
+      igniterCoil.visible = coilVisible
+      igniterLead.visible = coilVisible
+
       // particles: uniform axial flow, deflected around the rod's rounded tip
       // (potential flow past a sphere) and kept off the rod surface, plus Brownian drift and buoyancy
       const U = s.flowCmS / 10 // scene units per second
-      const buoy = (s.gravity ?? 0) * 0.28
       const R3 = R_ROD ** 3
       for (let i = 0; i < N_PARTICLES; i++) {
         let x = pos[i * 3]
@@ -268,16 +273,17 @@ export function DuctViewport3D(p: Props) {
         let z = pos[i * 3 + 2]
         const dx = x - X_TIP
         let vx = U
-        let vy = buoy
+        // Buoyancy only affects the thermal plume downstream of the burning tip
+        const inPlume = s.lit && dx > 0 && Math.hypot(y, z) < 0.25
+        let vy = inPlume ? (s.gravity ?? 0) * 0.16 : 0
         let vz = 0
         if (dx < 0) {
           // potential flow past a sphere of radius R at the tip:
-          // v = U ex + (U R^3 / 2) [ ex / r^3 - 3 dx r_vec / r^5 ]
           const r2 = Math.max(dx * dx + y * y + z * z, 1e-9)
           const r3 = r2 * Math.sqrt(r2)
           const c = (U * R3) / 2
           vx = U + c * (1 / r3 - (3 * dx * dx) / (r3 * r2))
-          vy = (-c * 3 * dx * y) / (r3 * r2)
+          vy += (-c * 3 * dx * y) / (r3 * r2)
           vz = (-c * 3 * dx * z) / (r3 * r2)
         }
         const jit = 0.02 * Math.sqrt(dt)
@@ -298,8 +304,17 @@ export function DuctViewport3D(p: Props) {
             z *= k
           }
         }
-        if (x > DUCT.x) x = -DUCT.x
-        if (x < -DUCT.x) x = DUCT.x
+        // When leaving duct, wrap around AND re-distribute across the intake face
+        if (x > DUCT.x) {
+          x = -DUCT.x
+          y = -DUCT.y + 0.03 + Math.random() * (DUCT.y * 2 - 0.06)
+          z = -DUCT.z + 0.03 + Math.random() * (DUCT.z * 2 - 0.06)
+        }
+        if (x < -DUCT.x) {
+          x = DUCT.x
+          y = -DUCT.y + 0.03 + Math.random() * (DUCT.y * 2 - 0.06)
+          z = -DUCT.z + 0.03 + Math.random() * (DUCT.z * 2 - 0.06)
+        }
         y = Math.min(DUCT.y - 0.01, Math.max(-DUCT.y + 0.01, y))
         z = Math.min(DUCT.z - 0.01, Math.max(-DUCT.z + 0.01, z))
         pos[i * 3] = x
