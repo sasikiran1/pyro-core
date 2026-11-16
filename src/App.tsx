@@ -11,7 +11,8 @@ import { RadiometricProbe, type ProbeReading } from './components/viewport/Radio
 import { PhaseNomogram } from './components/analytics/PhaseNomogram'
 import { ThermalRelaxation } from './components/analytics/ThermalRelaxation'
 import { TelemetryBars } from './components/analytics/TelemetryBars'
-import { EvidencePanel, insideFlightData } from './components/analytics/EvidencePanel'
+import { insideFlightData } from './components/analytics/EvidencePanel'
+import { InvestigationExplorer } from './components/analytics/InvestigationExplorer'
 import { SIIntelligenceCard } from './components/analytics/SIIntelligenceCard'
 import { Bass2TestLog } from './components/analytics/Bass2TestLog'
 import { loadBass2, plausibleO2, type Bass2Test } from './data/bass2Tests'
@@ -269,11 +270,11 @@ export default function App() {
                 </div>
               )}
             </div>
+            <InvestigationExplorer />
             <FirefightingSandbox materialShort={material.short} xO2={xO2} minLimitX={minLimit.x}
               onFlood={(x) => setX(x)} onReset={(x) => setX(x)} />
             <SIIntelligenceCard input={input} state={state} bass2={bass2} />
-            <Bass2TestLog rows={bass2} material={material} xO2={xO2} flowCmS={flowCmS} />
-            <EvidencePanel material={material} pressureKPa={pressureKPa} xO2={xO2} />
+            {bass2 && <Bass2TestLog rows={bass2} material={material} xO2={xO2} flowCmS={flowCmS} />}
             <section className="card text-[13px] text-slate-300 leading-relaxed">
               <h2 className="panel-title mb-1.5"><Info size={13} /> Hardware Rig &amp; The Igniter Coil</h2>
               <p className="mb-2">

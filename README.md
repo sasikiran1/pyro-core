@@ -30,12 +30,13 @@ Future spacecraft for the Moon (the Artemis program) are expected to use cabin a
 |---|---|
 | **See the fire you can't see** | The 3D view shows the same burning rod twice, side by side: as your eyes see it and as a thermal camera sees it. |
 | **One-click scenarios** | *Ghost flame*: a dim flame in Space Station air. *Artemis shift*: a fire-resistant fabric that can burn in the planned Moon-mission air. *Fan off*: the flame starves. *Too much air*: the flame blows out. |
-| **Change the cabin** | Pick the Space Station, the planned exploration atmosphere or the Space Shuttle's pre-spacewalk setting, or set pressure and oxygen yourself. |
+| **Change the cabin** | Pick the Space Station, the planned exploration atmosphere, the expected Moon Base air (30% oxygen at 10.2 psi) or the Space Shuttle's pre-spacewalk setting, or set pressure and oxygen yourself. |
 | **Change the fan** | Drag the airflow lever from still air to a strong breeze and watch the flame respond. |
 | **Change the material** | Acrylic (Plexiglas), Delrin, Nomex (flight-suit fabric), SIBAL (a NASA test fabric), cotton and silicone. |
 | **See where it can burn** | A map shows, for every fan speed and oxygen level, whether the flame can survive, with NASA's measured result drawn on it. |
 | **Compare Space Station and Artemis** | A table shows every material in both cabins, and which ones change from "cannot burn" to "can burn". |
 | **Put it out with nitrogen** | Flood the duct with nitrogen and see whether the flame can still burn. NASA tested this approach on the Space Station. |
+| **Explore NASA's investigations** | 17 NASA microgravity combustion investigations (BASS, BASS-II, Saffire, SAME, DAFT, FLEX, FLEX-2, CFI, ACME BRE, CFI-G and E-FIELD, SPICE, SLICE, SoFIE, FLARE, LUCI, FM2), ranked for your habitat (spacecraft, Moon Base, Mars, Earth applications) and safety goal (prevention, detection, suppression, modelling), with the reasons shown and a side-by-side comparison of up to three. |
 | **Read the evidence** | A briefing explains the result in plain words and lists the NASA flight measurements and experiments closest to your settings, with links. |
 | **How long does it stay hot?** | After the flame goes out, a cool-down chart estimates how long the rod stays dangerously hot. |
 | **Share a view** | "Copy link" saves exactly what you are looking at. |
@@ -159,6 +160,7 @@ npm run check-physics  # prints limits for every material and cabin; fails if th
 | **BASS-II: Burning and Suppression of Solids II**, NASA Physical Sciences Informatics (PSI) investigation PSI-25, [doi:10.60555/4qc4-de67](https://doi.org/10.60555/4qc4-de67), licence CC0-1.0 | Rod geometry, airflow range and tested conditions; the "BASS-II flight range" box on the map; optionally the experimental table (`PSI-25_Experimental table_BASS-II.csv`) for the test log. |
 | S. L. Olson and P. V. Ferkul, *Microgravity Flammability of PMMA Rods in Concurrent Flow*, 9th US National Combustion Meeting, 2015, NASA Technical Reports Server [20150008961](https://ntrs.nasa.gov/citations/20150008961) | The calibration value (13.6% O₂), the 13.3% blow-off intercept, the 16.1% and 16.4% spread findings, the stretch-rate Damköhler form, and the hot-wire igniter description. |
 | **BASS: Burning and Suppression of Solids**, PSI-26, [doi:10.60555/58h4-dy80](https://doi.org/10.60555/58h4-dy80), licence CC0-1.0 | Fuels, duct size and objectives (including inert-gas suppression) in the evidence panel and the nitrogen test. |
+| NASA Space Apps 2026 *Flame in Freefall* challenge description | Investigation facts in the explorer (fuels, hardware, conditions, purpose, data status), the expected Moon Base atmosphere, and the Earth spin-offs. |
 | NASA Glenn Research Center, [Combustion Science](https://www.nasa.gov/glenn/glenn-expertise-space-exploration/physical-sciences-program/combustion-science/) | Descriptions of SoFIE, FLARE, FM2, FLEX and SAME in the evidence panel. |
 | NASA-STD-6001B (2011) | Referenced as the standard normal-gravity flammability test; the app is not a substitute for it. |
 
@@ -199,7 +201,7 @@ No copyrighted images, audio or video are included. All screenshots in `docs/ima
 | Path | Contents |
 |---|---|
 | `src/physics/` | Constants (including the BASS-II calibration values), material table, combustion engine, rule-based interpreter |
-| `src/data/` | NASA investigations and flight findings with sources; BASS-II table loader |
+| `src/data/` | Investigation catalogue and ranking rule, NASA flight findings with sources, BASS-II table loader |
 | `src/shaders/flameShader.ts` | GPU flame: visible, thermal and CO-zone views |
 | `src/components/viewport/` | 3D duct, view toolbar, click probe |
 | `src/components/analytics/` | Result card, flammability map, evidence briefing, test log, cool-down chart |
