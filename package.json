@@ -2,7 +2,7 @@
   "name": "pyro-core",
   "private": true,
   "version": "0.1.0",
-  "description": "Interactive microgravity flammability explorer for spacecraft materials, calibrated to NASA BASS-II flight data (PSI-25), with an optional Google Gemini summary.",
+  "description": "Interactive microgravity flammability explorer for spacecraft materials, calibrated to NASA BASS-II flight data (PSI-25), with an optional Google Gemini summary. Code and docs written with AI coding assistance (Claude, Anthropic); see README \"Use of SI (AI) tools\".",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -31,5 +31,6 @@
     "tsx": "4.19.2",
     "typescript": "5.6.3",
     "vite": "5.4.10"
-  }
+  },
+  "author": "Sasi Kiran Gottipati"
 }

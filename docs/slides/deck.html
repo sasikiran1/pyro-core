@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PYRO-CORE demo slides</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /* 7 slides, 16:9. Regenerate the PDF: see docs/slides/README.md */
+  @page { size: 1280px 720px; margin: 0; }
+  :root { --bg: #07090E; --panel: #111726; --edge: #1E2638; --text: #e2e8f0; --muted: #94a3b8; --cyan: #00E5FF; --amber: #F59E0B; --rose: #F43F5E; --green: #34d399; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 1280px; height: 720px; padding: 56px 72px 48px; position: relative; overflow: hidden; page-break-after: always; break-after: page;
+    background: radial-gradient(1000px 500px at 85% 0%, rgba(0,229,255,0.07), transparent 60%), var(--bg); }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  .kicker { font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--cyan); margin-bottom: 14px; }
+  h1 { font-size: 64px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+  h2 { font-size: 44px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.1; margin-bottom: 26px; }
+  p, li { font-size: 24px; line-height: 1.4; color: #cbd5e1; }
+  .muted { color: var(--muted); }
+  .accent { color: var(--cyan); }
+  .hot { color: var(--rose); }
+  .ok { color: var(--green); }
+  .amber { color: var(--amber); }
+  .grid { display: grid; gap: 28px; }
+  .two { grid-template-columns: 1fr 1fr; align-items: center; }
+  .shot { width: 100%; border-radius: 12px; border: 1px solid var(--edge); box-shadow: 0 20px 60px rgba(0,0,0,0.5); display: block; }
+  .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 14px; padding: 22px 24px; }
+  .big { font-family: 'JetBrains Mono', monospace; font-size: 52px; font-weight: 700; line-height: 1; }
+  .label { font-size: 19px; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+  ol.steps { list-style: none; counter-reset: s; }
+  ol.steps li { counter-increment: s; position: relative; padding-left: 52px; margin-bottom: 16px; font-size: 23px; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,229,255,0.15); color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+  table { border-collapse: collapse; width: 100%; font-size: 21px; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--edge); }
+  th { color: var(--muted); font-weight: 600; font-size: 17px; text-transform: uppercase; letter-spacing: 0.06em; }
+  td.num { font-family: 'JetBrains Mono', monospace; }
+  .tag { white-space: nowrap; display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 16px; font-weight: 600; border: 1px solid; }
+  .tag.can { color: #fda4af; border-color: rgba(244,63,94,0.6); background: rgba(244,63,94,0.12); }
+  .tag.cannot { color: #6ee7b7; border-color: rgba(52,211,153,0.6); background: rgba(52,211,153,0.12); }
+  tr.flip td { background: rgba(245,158,11,0.08); }
+  footer { position: absolute; left: 72px; right: 72px; bottom: 20px; display: flex; justify-content: space-between; font-size: 14px; color: #64748b; font-family: 'JetBrains Mono', monospace; }
+  .flow { display: flex; align-items: stretch; gap: 18px; margin-top: 8px; }
+  .flow .card { flex: 1; }
+  .arrow { align-self: center; font-size: 34px; color: var(--cyan); }
+  a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- 1. Title -->
+<section class="slide">
+  <div class="grid two" style="height: 100%; grid-template-columns: 1.05fr 1fr;">
+    <div>
+      <div class="kicker">NASA Space Apps Challenge 2026</div>
+      <h1>PYRO-CORE</h1>
+      <p style="font-size: 32px; margin-top: 18px; color: var(--text); font-weight: 600;">Will this material catch fire in a spacecraft?</p>
+      <p style="margin-top: 30px;"><span class="muted">Challenge:</span> Flame in Freefall: SI-Powered Fire Safety Insights from Microgravity Combustion Data</p>
+      <p style="margin-top: 18px;"><span class="muted">Team:</span> Sasi Kiran Gottipati <span class="muted">(solo team)</span></p>
+      <p style="margin-top: 18px; font-size: 19px;"><span class="muted">Live app:</span> <a href="https://sasikiran1.github.io/pyro-core/">sasikiran1.github.io/pyro-core</a><br />
+        <span class="muted">Code:</span> <a href="https://github.com/sasikiran1/pyro-core">github.com/sasikiran1/pyro-core</a></p>
+    </div>
+    <img class="shot" src="../images/app-overview.png" alt="PYRO-CORE app" />
+  </div>
+  <footer><span>PYRO-CORE · Space Apps 2026 · Flame in Freefall</span><span>Slides prepared with SI assistance (see README) · 1/7</span></footer>
+</section>
+
+<!-- 2. Intro: the problem -->
+<section class="slide">
+  <div class="kicker">Why fire is different in orbit</div>
+  <h2>In orbit, nothing rises.<br /><span class="accent">The fan is the fire's only air.</span></h2>
+  <div class="grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 8px;">
+    <div class="card"><div class="big amber" style="font-size: 36px;">Not too little, not too much</div><div class="label">Too little airflow and a flame starves; too much and it blows out. In between, it keeps burning.</div></div>
+    <div class="card"><div class="big hot">13.6%</div><div class="label">Oxygen at which NASA's BASS-II kept acrylic burning on the Space Station, below the 17.3% the ground test suggests.</div></div>
+    <div class="card"><div class="big accent">34% O₂</div><div class="label">Planned for Artemis-era cabins, at lower pressure (56.5 kPa). Which materials can burn there?</div></div>
+  </div>
+  <p style="margin-top: 30px;">Near its limit, a flame in orbit burns <strong>dim and blue</strong>: easy to miss by eye.</p>
+  <footer><span>PYRO-CORE · Space Apps 2026 · Flame in Freefall</span><span>Slides prepared with SI assistance (see README) · 2/7</span></footer>
+</section>
+
+<!-- 3. What it does: user experience -->
+<section class="slide">
+  <div class="kicker">What PYRO-CORE does</div>
+  <h2>Explore spacecraft fire in a browser</h2>
+  <div class="grid two" style="grid-template-columns: 0.9fr 1.1fr;">
+    <ol class="steps">
+      <li><strong>Pick a cabin</strong>: Space Station, Artemis or your own pressure and oxygen.</li>
+      <li><strong>Pick a material</strong>: acrylic, Delrin, Nomex, NASA test fabric, cotton, silicone.</li>
+      <li><strong>Drag the fan lever</strong> and watch the flame live or die in 3D.</li>
+      <li><strong>Read the verdict</strong>: can it burn, how visible is it, and what NASA measured.</li>
+      <li><strong>Try a scenario</strong> or share the exact view with one link.</li>
+    </ol>
+    <img class="shot" src="../images/app-overview.png" alt="App overview" />
+  </div>
+  <footer><span>PYRO-CORE · Space Apps 2026 · Flame in Freefall</span><span>Slides prepared with SI assistance (see README) · 3/7</span></footer>
+</section>
+
+<!-- 4. The fire you can't see -->
+<section class="slide">
+  <div class="kicker">The fire you can't see</div>
+  <div class="grid two" style="grid-template-columns: 1fr 1.25fr;">
+    <div>
+      <h2>Your eyes vs a<br /><span class="hot">thermal camera</span></h2>
+      <p>The same burning rod, side by side. In Space Station air at a gentle 1.5 cm/s breeze, the flame is faint to the eye but clear at 3.8 µm infrared.</p>
+      <p style="margin-top: 18px;">One-click scenarios show the rest: <span class="amber">fan off</span> (it starves), <span class="amber">too much air</span> (it blows out), and the <span class="amber">Artemis shift</span>.</p>
+    </div>
+    <img class="shot" src="../images/thermal-view.png" alt="Thermal camera view of the flame" />
+  </div>
+  <footer><span>PYRO-CORE · Space Apps 2026 · Flame in Freefall</span><span>Slides prepared with SI assistance (see README) · 4/7</span></footer>
+</section>
+
+<!-- 5. NASA data makes it possible -->
+<section class="slide">
+  <div class="kicker">Built on NASA flight data</div>
+  <h2>NASA measured it on the ISS.<br /><span class="accent">PYRO-CORE lets you explore around it.</span></h2>
+  <div class="flow">
+    <div class="card"><div style="font-size: 21px; font-weight: 700; color: var(--text);">NASA BASS-II (PSI-25)</div><div class="label">Acrylic rods burned in a wind tunnel on the ISS, down to 13.6% O₂ (Olson &amp; Ferkul, 2015).</div></div>
+    <div class="arrow">→</div>
+    <div class="card"><div style="font-size: 21px; font-weight: 700; color: var(--text);">Physics model, fitted</div><div class="label">Heat made vs heat lost, in the form NASA's researchers used. Tuned to match 13.6%.</div></div>
+    <div class="arrow">→</div>
+    <div class="card"><div style="font-size: 21px; font-weight: 700; color: var(--text);">Every answer labelled</div><div class="label">"Measured by NASA" or "model estimate", with links to BASS, BASS-II, SoFIE, FLARE, FM2.</div></div>
+  </div>
+  <p style="margin-top: 30px;">The evidence briefing ranks the closest NASA flight findings for your settings. An optional Google Gemini summary may only repeat those facts: any new number is rejected.</p>
+  <footer><span>PYRO-CORE · Space Apps 2026 · Flame in Freefall</span><span>Slides prepared with SI assistance (see README) · 5/7</span></footer>
+</section>
+
+<!-- 6. Result: ISS vs Artemis -->
+<section class="slide">
+  <div class="kicker">What the model shows</div>
+  <h2>Moving to Artemis air changes <span class="amber">which materials can burn</span></h2>
+  <table>
+    <thead><tr><th>Material</th><th>Lowest O₂ to burn: ISS (21%)</th><th></th><th>Artemis (34%, 56.5 kPa)</th><th></th></tr></thead>
+    <tbody>
+      <tr><td>Acrylic (PMMA)</td><td class="num">13.6% <span class="muted" style="font-size: 15px;">NASA-matched</span></td><td><span class="tag can">can burn</span></td><td class="num">15.9%</td><td><span class="tag can">can burn</span></td></tr>
+      <tr><td>Cotton</td><td class="num">14.1%</td><td><span class="tag can">can burn</span></td><td class="num">16.6%</td><td><span class="tag can">can burn</span></td></tr>
+      <tr class="flip"><td><strong>Nomex</strong> <span class="muted">(flight-suit fabric)</span></td><td class="num">22.2%</td><td><span class="tag cannot">cannot burn</span></td><td class="num">27.6%</td><td><span class="tag can">can burn</span></td></tr>
+      <tr class="flip"><td><strong>Silicone</strong> <span class="muted">(estimated values)</span></td><td class="num">21.8%</td><td><span class="tag cannot">cannot burn</span></td><td class="num">27.1%</td><td><span class="tag can">can burn</span></td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top: 22px; font-size: 20px;" class="muted">Model results. Only acrylic in ISS air is matched to flight data; Artemis results are beyond NASA's measurements, and the app says so on screen. Not a safety certification.</p>
+  <footer><span>PYRO-CORE · Space Apps 2026 · Flame in Freefall</span><span>Slides prepared with SI assistance (see README) · 6/7</span></footer>
+</section>
+
+<!-- 7. Future -->
+<section class="slide">
+  <div class="kicker">Looking ahead</div>
+  <h2>Show where NASA has measured fire safety,<br /><span class="accent">and where it has not yet.</span></h2>
+  <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="card"><div style="font-size: 22px; font-weight: 700;">For students</div><div class="label">See why fire behaves differently in space, in one interactive picture.</div></div>
+    <div class="card"><div style="font-size: 22px; font-weight: 700;">For engineers</div><div class="label">Spot which cabin and material combinations have no flight data yet.</div></div>
+    <div class="card"><div style="font-size: 22px; font-weight: 700;">Next steps</div><div class="label">Load NASA's full PSI test tables, add Saffire and SoFIE results, and lunar data once FM2 flies.</div></div>
+  </div>
+  <p style="margin-top: 34px; font-size: 21px;">Try it: <a href="https://sasikiran1.github.io/pyro-core/">sasikiran1.github.io/pyro-core</a> &nbsp;·&nbsp; Code (MIT): <a href="https://github.com/sasikiran1/pyro-core">github.com/sasikiran1/pyro-core</a></p>
+  <p style="margin-top: 10px; font-size: 18px;" class="muted">NASA data: BASS-II (PSI-25, doi:10.60555/4qc4-de67), BASS (PSI-26, doi:10.60555/58h4-dy80), NTRS 20150008961. Not a NASA product.</p>
+  <footer><span>PYRO-CORE · Space Apps 2026 · Flame in Freefall</span><span>Slides prepared with SI assistance (see README) · 7/7</span></footer>
+</section>
+
+</body>
+</html>
