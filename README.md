@@ -210,7 +210,7 @@ No copyrighted images, audio or video are included. All screenshots in `docs/ima
 ## Links
 
 - **Live app:** https://sasikiran1.github.io/pyro-core/
-- **Demo (7 slides):** [docs/PYRO-CORE-demo-slides.pdf](docs/PYRO-CORE-demo-slides.pdf)
+- **Demo (7 slides, PowerPoint):** [docs/PYRO-CORE-demo-slides.pptx](docs/PYRO-CORE-demo-slides.pptx)
 - **Team:** Sasi Kiran Gottipati (solo team)
 
 ## Licence
