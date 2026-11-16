@@ -205,7 +205,6 @@ No copyrighted images, audio or video are included. All screenshots in `docs/ima
 | `src/components/controls/` | Cabin, airflow lever, material, scenarios, nitrogen test |
 | `src/components/export/` | ISS vs Artemis table, screening summary |
 | `scripts/checkPhysics.ts` | Limits for every material and cabin; exits non-zero if the calibration drifts |
-| `docs/video_script.md` | 30-second demo script, with states checked against the model |
 
 ## Links
 
