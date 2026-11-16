@@ -9,7 +9,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "check-physics": "tsx scripts/checkPhysics.ts"
+    "check-physics": "tsx scripts/checkPhysics.ts",
+    "build:pages": "tsc --noEmit && vite build --base=/pyro-core/"
   },
   "dependencies": {
     "clsx": "2.1.1",

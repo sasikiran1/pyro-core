@@ -142,6 +142,7 @@ You need [Node.js](https://nodejs.org) 18 or newer.
 npm install
 npm run dev            # open http://localhost:5173
 npm run build          # production build in dist/
+npm run build:pages    # build for GitHub Pages (served at /pyro-core/); publish dist/ to the gh-pages branch
 npm run check-physics  # prints limits for every material and cabin; fails if the NASA calibration drifts
 ```
 
