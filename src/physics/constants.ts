@@ -76,7 +76,7 @@ export const ATMOSPHERES: Atmosphere[] = [
     xO2: 0.34,
     note: '8.2 psi, 34% O2: proposed for Artemis-era vehicles to shorten spacesuit pre-breathe',
   },
-  { id: 'moonbase', name: 'Moon Base (expected)', pressureKPa: 70.3, xO2: 0.3, note: '10.2 psi, 30% O2: lower bound of the Moon Base air expected in the NASA challenge brief (≥30% O2, ≤10.2 psi)' },
+  { id: 'moonbase', name: 'Moon Base', pressureKPa: 70.3, xO2: 0.3, note: '10.2 psi, 30% O2: NASA planning values for the Moon Base and rovers (30% O2 or more at 10.2 psi or less)' },
   { id: 'staged', name: 'Shuttle staged', pressureKPa: 70.3, xO2: 0.265, note: '10.2 psi, 26.5% O2: used on Shuttle before spacewalks' },
 ]
 
