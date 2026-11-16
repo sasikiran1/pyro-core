@@ -66,15 +66,16 @@ export function FlowDamper({ flowCmS, onChange, lit, canIgnite, onToggleFlame }:
             <div className="hud text-3xl text-cyan-nasa glow-cyan">{flowCmS.toFixed(1)}</div>
             <div className="hud text-[12px] text-slate-400">cm/s forced airflow</div>
             <div className="text-[11px] text-cyan-nasa/90 font-medium mt-1">
+              {/* Plain descriptions only: whether the flame survives is shown by the model, not by this label. */}
               {flowCmS <= 0.2
-                ? 'Dead air (fans off) — fire suffocates'
+                ? 'Fan off: no forced airflow'
                 : flowCmS <= 3.0
-                  ? 'Gentle draft (slower than a snail)'
+                  ? 'Very gentle draft'
                   : flowCmS <= 15.0
-                    ? 'Normal cabin AC breeze'
+                    ? 'Moderate airflow'
                     : flowCmS <= 28.0
-                      ? 'Fast duct exhaust airflow'
-                      : 'High-speed blast — blow-off risk'}
+                      ? 'Strong airflow'
+                      : 'Very strong airflow (top of the BASS-II fan range)'}
             </div>
             <div className="text-[11px] text-slate-500 mt-2 leading-snug">
               No gravity means no rising hot air: this fan flow is the only oxygen the flame receives.

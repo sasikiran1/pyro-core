@@ -13,10 +13,11 @@ import { ThermalRelaxation } from './components/analytics/ThermalRelaxation'
 import { TelemetryBars } from './components/analytics/TelemetryBars'
 import { EvidencePanel, insideFlightData } from './components/analytics/EvidencePanel'
 import { SIIntelligenceCard } from './components/analytics/SIIntelligenceCard'
+import { Bass2TestLog } from './components/analytics/Bass2TestLog'
+import { loadBass2, plausibleO2, type Bass2Test } from './data/bass2Tests'
 import { ReportModal, download } from './components/export/ReportModal'
 import { ComparisonModal } from './components/export/ComparisonModal'
 import { ScenarioBar, type ScenarioId } from './components/controls/ScenarioBar'
-import { PlanetaryGravityModule } from './components/controls/PlanetaryGravityModule'
 import { FirefightingSandbox } from './components/controls/FirefightingSandbox'
 import { cooling as coolingCurve, evaluate, fieldAt, minimumLimit } from './physics/combustionEngine'
 import { materialById } from './physics/materialDatabase'
@@ -54,12 +55,14 @@ export default function App() {
   const [compareOpen, setCompareOpen] = useState(false)
   const [scenario, setScenario] = useState<ScenarioId | null>(null)
   const [copied, setCopied] = useState(false)
-  const [gravity, setGravity] = useState(0.0)
   const [showCoil, setShowCoil] = useState(true)
   const scenarioTimer = useRef<number | null>(null)
+  // NASA BASS-II experimental table (public/data/bass2.csv), if the user has added it
+  const [bass2, setBass2] = useState<Bass2Test[] | null>(null)
+  useEffect(() => { loadBass2().then(setBass2) }, [])
 
   const material = materialById(materialId)
-  const input = useMemo(() => ({ pressureKPa, xO2, flowCmS, material, gravity }), [pressureKPa, xO2, flowCmS, material, gravity])
+  const input = useMemo(() => ({ pressureKPa, xO2, flowCmS, material }), [pressureKPa, xO2, flowCmS, material])
   const state = useMemo(() => evaluate(input), [input])
   const lit = ignited && state.burning
 
@@ -123,24 +126,10 @@ export default function App() {
   }, [])
   useEffect(() => () => { if (scenarioTimer.current) window.clearTimeout(scenarioTimer.current) }, [])
 
-  const handleVacuumDump = useCallback(() => {
-    setP(0.1)
-  }, [])
-
-  const handleNitrogenPurge = useCallback(() => {
-    setX(0.04)
-  }, [])
-
-  const handleCo2Blast = useCallback(() => {
-    setFlow(40.0)
-    setX((prev) => Math.min(prev, 0.12))
-  }, [])
-
   const handleResetCabin = useCallback(() => {
     setP(START_ATM.pressureKPa)
     setX(START_ATM.xO2)
     setFlow(1.5)
-    setGravity(0.0)
     setMaterialId('pmma')
     setIgnited(true)
     setOutAt(null)
@@ -186,7 +175,6 @@ export default function App() {
         left={
           <>
             <AtmosphereModule pressureKPa={pressureKPa} xO2={xO2} onChange={(p, x) => { setP(p); setX(x) }} />
-            <PlanetaryGravityModule gravity={gravity} onChange={setGravity} />
             <FlowDamper flowCmS={flowCmS} onChange={setFlow} lit={lit} canIgnite={state.burning}
               onToggleFlame={() => {
                 if (lit) {
@@ -225,12 +213,12 @@ export default function App() {
             </section>
             <div className="bg-gradient-to-r from-cyan-950/40 via-deck to-void border border-cyan-nasa/30 rounded-lg p-2.5 text-[12px] text-slate-300 leading-snug">
               <strong className="text-cyan-nasa font-semibold">The Space Combustion Paradox: </strong>
-              On Earth, blowing on a fire blows it out. In zero gravity, a fire has no rising hot air, so it suffocates in its own smoke unless a ventilation fan feeds it fresh oxygen. Near its limit, it burns as a quiet, invisible blue flame.
+              On Earth, hot air rises and keeps feeding a flame fresh oxygen. In orbit nothing rises, so a flame lives only on the air a fan pushes past it: too little and it starves, too much and it blows off. Near its limit it burns dim and blue, easy to miss by eye.
             </div>
             <ScenarioBar onRun={runScenario} active={scenario} />
             <div className="card p-0 overflow-hidden relative h-[50vh] min-h-[340px]">
               <DuctViewport3D state={state} flowCmS={flowCmS} mode={mode} rodT={rodT} lit={lit} probe={probeAt}
-                onProbe={(x, y) => setProbeAt({ x, y })} gravity={gravity} showCoil={showCoil} />
+                onProbe={(x, y) => setProbeAt({ x, y })} gravity={0} showCoil={showCoil} />
               <div className="absolute top-2 left-2 flex items-center gap-2">
                 <SpectralToolbar mode={mode} onChange={setMode} />
                 <button
@@ -241,22 +229,11 @@ export default function App() {
                       ? 'border-amber-500/60 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50'
                       : 'border-edge bg-deck/80 text-slate-400 hover:text-slate-200'
                   }`}
-                  title="NASA BASS-II uses an electric Nichrome hot-wire coil around the fuel rod tip to initiate pyrolysis and ignition in zero-g. Click to toggle coil display."
+                  title="BASS-II rods were ignited at the tip with a Kanthal A-1 hot-wire igniter (Olson &amp; Ferkul 2015). Click to show or hide the coil."
                 >
                   <Zap size={12} className={showCoil ? 'text-amber-400' : 'text-slate-500'} />
                   <span>Igniter Coil: {showCoil ? 'ON' : 'OFF'}</span>
                 </button>
-              </div>
-              <div className="absolute top-2 right-2 hud text-[11px] text-slate-300 bg-deck/85 border border-edge/80 px-2.5 py-1.5 rounded backdrop-blur max-w-[280px] pointer-events-none text-right">
-                <div className="text-[10px] text-cyan-nasa font-semibold uppercase tracking-wider flex items-center justify-end gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-nasa animate-ping" />
-                  NASA BASS-II Flow Duct
-                </div>
-                <div className="text-slate-100 font-medium">1.27 cm Solid Polymer Fuel Rod</div>
-                <div className="text-[10px] text-amber-300/90 flex items-center justify-end gap-1 mt-0.5">
-                  <Zap size={10} /> Nichrome Hot-Wire Igniter Loop at Tip
-                </div>
-                <div className="text-[10px] text-slate-400 mt-0.5">Electric pulse heats coil to pyrolyze rod tip</div>
               </div>
               {lit && state.regime === 'blue' && mode === 'visible' && (
                 <button onClick={() => setMode('mwir')}
@@ -292,21 +269,18 @@ export default function App() {
                 </div>
               )}
             </div>
-            <FirefightingSandbox
-              onVacuumDump={handleVacuumDump}
-              onNitrogenPurge={handleNitrogenPurge}
-              onCo2Blast={handleCo2Blast}
-              onReset={handleResetCabin}
-            />
-            <SIIntelligenceCard input={input} state={state} />
+            <FirefightingSandbox materialShort={material.short} xO2={xO2} minLimitX={minLimit.x}
+              onFlood={(x) => setX(x)} onReset={(x) => setX(x)} />
+            <SIIntelligenceCard input={input} state={state} bass2={bass2} />
+            <Bass2TestLog rows={bass2} material={material} xO2={xO2} flowCmS={flowCmS} />
             <EvidencePanel material={material} pressureKPa={pressureKPa} xO2={xO2} />
             <section className="card text-[13px] text-slate-300 leading-relaxed">
               <h2 className="panel-title mb-1.5"><Info size={13} /> Hardware Rig &amp; The Igniter Coil</h2>
               <p className="mb-2">
                 In NASA's <strong>BASS-II (Burning and Suppression of Solids - II)</strong> flight experiment on the ISS Microgravity Science Glovebox,
-                fuel rods (1.27 cm diameter) are mounted in the flow duct with a <strong>Nichrome hot-wire coil</strong> wrapped around the tip.
-                An electric current pulses through the wire loop to heat and pyrolyze the fuel until it catches fire. Once ignited, the current is turned off,
-                and the flame sustains solely via forced airflow from the duct fan. You can show or hide the coil using the toolbar button in the viewport.
+                PMMA rods 0.64–1.27 cm across were mounted in a small flow duct and lit at the tip by an astronaut with a <strong>Kanthal hot-wire igniter</strong>
+                (Olson &amp; Ferkul 2015). After ignition the flame lives only on the duct fan's airflow. This app models the largest rod size; show or hide the
+                coil with the button in the viewport.
               </p>
               <h3 className="text-slate-200 font-semibold text-[12px] uppercase tracking-wider mb-1">Why fire is different in orbit</h3>
               <p>
@@ -321,7 +295,8 @@ export default function App() {
         right={
           <>
             <TelemetryBars s={state} xO2={xO2} />
-            <PhaseNomogram material={material} pressureKPa={pressureKPa} xO2={xO2} flowCmS={flowCmS} onPick={(u, x) => { setFlow(u); setX(x) }} />
+            <PhaseNomogram material={material} pressureKPa={pressureKPa} xO2={xO2} flowCmS={flowCmS} onPick={(u, x) => { setFlow(u); setX(x) }}
+              tests={(bass2 ?? []).filter((r) => r.materialId === material.id && r.airCmS !== null && plausibleO2(r)).map((r) => ({ u: r.airCmS!, x: r.o2Final! }))} />
             <ThermalRelaxation material={material} cooling={cool} safeT={safeT} onSafeT={setSafeT} sinceOut={sinceOut} rodT={rodT} />
           </>
         }
@@ -330,7 +305,7 @@ export default function App() {
             <strong className="text-slate-400">Model calibrated to one NASA measurement.</strong> Reduced-order physics (Huggett oxygen-consumption heat
             release, Olson &amp; Ferkul's stretch-rate Damköhler number, a radiation-loss number, Spalding B, Ranz–Marshall heat transfer). Only PMMA's lowest
             limit at ISS pressure is fitted to flight data (BASS-II, 13.6% O₂); everything else is extrapolation. Cool flames are not modelled: in microgravity
-            they have been seen for liquid droplets (FLEX), not solid polymers. Not a NASA product or document. Built with AI assistance (see README).
+            they have been seen for liquid droplets (FLEX), not solid polymers. Not a NASA product or document.
           </footer>
         }
       />

@@ -2,7 +2,7 @@
   "name": "pyro-core",
   "private": true,
   "version": "0.1.0",
-  "description": "Interactive microgravity flammability model for polymer rods, calibrated to NASA BASS-II flight data (PSI-25). Code written with AI assistance (Claude, Anthropic); see README \"Use of AI\".",
+  "description": "Interactive microgravity flammability explorer for spacecraft materials, calibrated to NASA BASS-II flight data (PSI-25), with an optional Google Gemini summary.",
   "license": "MIT",
   "type": "module",
   "scripts": {

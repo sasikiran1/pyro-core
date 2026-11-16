@@ -3,6 +3,7 @@ import { BrainCircuit, ExternalLink, ShieldAlert, ShieldCheck, ShieldQuestion } 
 import { clsx } from 'clsx'
 import { interpret, rankFindings } from '../../physics/siInterpreter'
 import type { EngineInput, EngineState } from '../../types/combustion'
+import { nearestTests, plausibleO2, type Bass2Test } from '../../data/bass2Tests'
 
 const LEVEL_STYLE = {
   'cannot burn': { cls: 'border-emerald-500/60 text-emerald-300 bg-emerald-500/10', Icon: ShieldCheck, text: 'Cannot burn here (model)' },
@@ -20,9 +21,30 @@ function allowedNumbers(facts: Record<string, unknown>) {
   return set
 }
 
-export function SIIntelligenceCard({ input, state }: { input: EngineInput; state: EngineState }) {
+export function SIIntelligenceCard({ input, state, bass2 = null }: { input: EngineInput; state: EngineState; bass2?: Bass2Test[] | null }) {
   const ranked = useMemo(() => rankFindings(input.material.id, input.pressureKPa, input.xO2), [input.material.id, input.pressureKPa, input.xO2])
-  const it = useMemo(() => interpret(input, state, ranked), [input, state, ranked])
+  const it = useMemo(() => {
+    const base = interpret(input, state, ranked)
+    if (!bass2) return base
+    // Add NASA's BASS-II test log to the briefing and to the facts the AI summary may use.
+    const mine = bass2.filter((r) => r.materialId === input.material.id && plausibleO2(r))
+    const near = nearestTests(bass2, input.material.id, input.xO2, input.flowCmS, 1)[0]?.r
+    const o2 = mine.map((r) => r.o2Final!)
+    const bullet = mine.length
+      ? `NASA test log: BASS-II ran ${mine.length} tests with ${input.material.short}, at post-test O₂ from ${(Math.min(...o2) * 100).toFixed(1)}% to ${(Math.max(...o2) * 100).toFixed(1)}%. The closest is test ${near?.test} (${near?.date}). The log records conditions, not outcomes.`
+      : `NASA test log: BASS-II's ${bass2.length} tests did not use ${input.material.short}.`
+    return {
+      ...base,
+      bullets: [...base.bullets, bullet],
+      facts: {
+        ...base.facts,
+        nasa_bass2_tests_with_this_material: mine.length,
+        nasa_bass2_post_test_O2_min_percent: o2.length ? Number((Math.min(...o2) * 100).toFixed(1)) : 'none',
+        nasa_bass2_post_test_O2_max_percent: o2.length ? Number((Math.max(...o2) * 100).toFixed(1)) : 'none',
+        nasa_bass2_log_records_outcomes: false,
+      },
+    }
+  }, [input, state, ranked, bass2])
   const L = LEVEL_STYLE[it.level]
 
   // Optional AI summary. The key is kept in memory for this tab only and sent only to the endpoint typed here.

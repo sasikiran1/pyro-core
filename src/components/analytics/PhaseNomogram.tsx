@@ -24,9 +24,11 @@ interface Props {
   xO2: number
   flowCmS: number
   onPick: (flowCmS: number, xO2: number) => void
+  /** NASA BASS-II test conditions for this material (airflow cm/s, post-test O2 fraction); no outcomes recorded */
+  tests?: { u: number; x: number }[]
 }
 
-export function PhaseNomogram({ material, pressureKPa, xO2, flowCmS, onPick }: Props) {
+export function PhaseNomogram({ material, pressureKPa, xO2, flowCmS, onPick, tests = [] }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null)
   // The 3000-cell grid is the slowest thing on the page; let slider drags render first and the map catch up.
   const pDeferred = useDeferredValue(pressureKPa)
@@ -121,6 +123,17 @@ export function PhaseNomogram({ material, pressureKPa, xO2, flowCmS, onPick }: P
       if (!started) { g.moveTo(sx(u), sy(Math.max(x, X_MIN))); started = true } else g.lineTo(sx(u), sy(Math.max(x, X_MIN)))
     }
     g.stroke()
+    // NASA BASS-II test conditions (hollow green diamonds): what was tested, not whether it burned
+    if (tests.length && pressureKPa > 95 && pressureKPa < 106) {
+      g.strokeStyle = '#34d399'
+      g.lineWidth = 1.5
+      for (const t of tests) {
+        if (t.u < 0 || t.u > U_MAX || t.x < X_MIN || t.x > X_MAX) continue
+        const px = sx(t.u)
+        const py = sy(t.x)
+        g.beginPath(); g.moveTo(px, py - 4); g.lineTo(px + 4, py); g.lineTo(px, py + 4); g.lineTo(px - 4, py); g.closePath(); g.stroke()
+      }
+    }
     // operating point
     const ox = sx(Math.min(flowCmS, U_MAX))
     const oy = sy(Math.min(Math.max(xO2, X_MIN), X_MAX))
@@ -132,7 +145,7 @@ export function PhaseNomogram({ material, pressureKPa, xO2, flowCmS, onPick }: P
     g.beginPath(); g.arc(ox, oy, 6, 0, Math.PI * 2); g.stroke()
     g.beginPath(); g.moveTo(ox - 11, oy); g.lineTo(ox - 7, oy); g.moveTo(ox + 7, oy); g.lineTo(ox + 11, oy)
     g.moveTo(ox, oy - 11); g.lineTo(ox, oy - 7); g.moveTo(ox, oy + 7); g.lineTo(ox, oy + 11); g.stroke()
-  }, [grid, xO2, flowCmS, material])
+  }, [grid, xO2, flowCmS, material, tests, pressureKPa])
 
   const pick = (e: React.PointerEvent) => {
     const c = canvas.current!
@@ -161,6 +174,7 @@ export function PhaseNomogram({ material, pressureKPa, xO2, flowCmS, onPick }: P
           </li>
         ))}
         <li className="flex items-center gap-2"><span className="w-2.5 h-0.5 bg-slate-200" /> model limit (flame needs O₂ above this line)</li>
+        {tests.length > 0 && <li className="flex items-center gap-2"><span className="w-2.5 h-2.5 rotate-45 border border-emerald-400" /> NASA BASS-II test conditions for this material ({tests.length}; table does not record outcomes)</li>}
         <li className="flex items-center gap-2"><span className="w-2.5 h-0.5 bg-emerald-400" /> NASA BASS-II: lowest O₂ a PMMA rod burned at on the ISS</li>
       </ul>
       <p className="text-[11px] text-slate-500 mt-2 leading-snug">

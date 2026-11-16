@@ -10,7 +10,7 @@ Screen: the app at 1280×800 or larger. Open `/` (it starts with PMMA in ISS air
 | 3–10 s | Default view. Left half: the rod looks almost dark. Right half: a bright thermal glow at the tip. | "This plastic rod is burning, in ISS air with a gentle fan. Your eyes barely see it. A thermal camera does." |
 | 10–17 s | Drag the **Oxygen fraction** slider to 17%. Then drag the airflow lever to 0. Header changes to "Out: too little flow (radiative quench)"; the cool-down panel starts counting. | "In orbit nothing rises, so the fan is the flame's only air. Turn it off and, at 17% oxygen, it starves. The rod stays hot for minutes." |
 | 17–23 s | Point at the map: the green line "ISS flight: PMMA burned at 13.6%" below the dashed 1 g line. | "NASA's BASS-II burned these rods on the station down to 13.6% oxygen, below the 17.3% the ground test allows. Our model is calibrated to that." |
-| 23–30 s | Click **Exploration atmosphere**, then **Nomex**. Scroll down to **Evidence briefing** showing ranked NASA BASS-II flight tests and the AI summary. | "In the 34% oxygen planned for Artemis, even astronaut flight suits can burn. Our SI Evidence Briefing ranks NASA flight data and writes a hallucination-guarded safety summary." |
+| 23–30 s | Click **Exploration atmosphere**, then **Nomex**. Scroll down to **Evidence briefing** showing ranked NASA BASS-II flight tests and the AI summary. | "In the 34% oxygen planned for Artemis-era cabins, our model says even Nomex, a flight-suit fabric, can burn, and no flight data covers that yet. The evidence briefing ranks NASA's flight findings, and an optional AI summary is checked against them." |
 
 ## Words to avoid
 

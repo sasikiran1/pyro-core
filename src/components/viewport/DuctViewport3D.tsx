@@ -126,7 +126,7 @@ export function DuctViewport3D(p: Props) {
     tip.position.set(X_TIP, 0, 0)
     scene.add(tip)
 
-    // ---- nichrome hot-wire igniter coil (NASA BASS-II glovebox ignition loop) ----
+    // ---- hot-wire igniter coil at the rod tip (BASS-II used a Kanthal A-1 hot wire; Olson & Ferkul 2015) ----
     const coilMat = new THREE.MeshStandardMaterial({ color: 0xb58a55, metalness: 0.85, roughness: 0.3, emissive: 0x000000 })
     const igniterCoil = new THREE.Mesh(new THREE.TorusGeometry(R_ROD + 0.007, 0.0035, 12, 32), coilMat)
     igniterCoil.rotation.y = Math.PI / 2
