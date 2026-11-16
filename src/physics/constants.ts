@@ -78,3 +78,21 @@ export const ATMOSPHERES: Atmosphere[] = [
   },
   { id: 'staged', name: 'Shuttle staged', pressureKPa: 70.3, xO2: 0.265, note: '10.2 psi, 26.5% O2: used on Shuttle before spacewalks' },
 ]
+
+export interface PlanetaryGravity {
+  id: string
+  name: string
+  short: string
+  g: number // fraction of 1g
+  buoyantDraftCmS: number
+  note: string
+}
+
+export const U_BUOYANT_1G = 0.20 // m/s, buoyant plume velocity in normal gravity
+
+export const PLANETARY_GRAVITIES: PlanetaryGravity[] = [
+  { id: 'orbit', name: 'Microgravity (Orbit)', short: '0.00g Space', g: 0.0, buoyantDraftCmS: 0, note: 'Zero buoyant draft. Flame lives only on ventilation fan airflow.' },
+  { id: 'moon', name: 'Moon Surface Base', short: '0.16g Moon', g: 0.16, buoyantDraftCmS: 8.0, note: 'Weak buoyant draft (~8 cm/s). Flame forms an upright hemispherical dome.' },
+  { id: 'mars', name: 'Mars Surface Habitat', short: '0.38g Mars', g: 0.38, buoyantDraftCmS: 12.3, note: 'Moderate buoyant draft (~12 cm/s). Bulbous, soft flame with slow flicker.' },
+  { id: 'earth', name: 'Earth 1g Terrestrial', short: '1.00g Earth', g: 1.0, buoyantDraftCmS: 20.0, note: 'Strong buoyant chimney draft (~20 cm/s). Classic tall flickering teardrop.' },
+]

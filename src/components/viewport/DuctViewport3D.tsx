@@ -21,6 +21,8 @@ interface Props {
   lit: boolean
   probe: { x: number; y: number } | null
   onProbe: (xMetres: number, yMetres: number) => void
+  /** Gravity fraction (0 for microgravity, 0.16 Moon, 0.38 Mars, 1.0 Earth) */
+  gravity?: number
 }
 
 const REGIME_LED: Record<string, number> = {
@@ -252,11 +254,13 @@ export function DuctViewport3D(p: Props) {
       u.uFlowFrac.value = Math.min(s.flowCmS / 40, 1)
       u.uSoot.value = s.state.soot
       u.uBurning.value = burnSmooth
+      u.uGravity.value = s.gravity ?? 0
       ledMat.color.setHex(s.lit ? REGIME_LED[s.state.regime] : 0x10b981)
 
       // particles: uniform axial flow, deflected around the rod's rounded tip
-      // (potential flow past a sphere) and kept off the rod surface, plus Brownian drift
+      // (potential flow past a sphere) and kept off the rod surface, plus Brownian drift and buoyancy
       const U = s.flowCmS / 10 // scene units per second
+      const buoy = (s.gravity ?? 0) * 0.28
       const R3 = R_ROD ** 3
       for (let i = 0; i < N_PARTICLES; i++) {
         let x = pos[i * 3]
@@ -264,7 +268,7 @@ export function DuctViewport3D(p: Props) {
         let z = pos[i * 3 + 2]
         const dx = x - X_TIP
         let vx = U
-        let vy = 0
+        let vy = buoy
         let vz = 0
         if (dx < 0) {
           // potential flow past a sphere of radius R at the tip:

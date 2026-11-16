@@ -28,6 +28,7 @@ uniform float uFlowFrac;   // 0..1 of full damper
 uniform float uSoot;       // 0..1
 uniform float uBurning;    // 0 or 1 (smoothed in JS)
 uniform int uMode;         // 0 visible, 1 MWIR, 2 CO
+uniform float uGravity;    // 0..1 fraction of Earth gravity
 
 // --- 3D simplex noise (Ashima Arts / Stefan Gustavson, MIT) ---
 vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
@@ -80,20 +81,26 @@ const float X_TIP = -0.35;    // upstream tip of the rod; the rod runs downstrea
 // Distance from the rod's capsule-shaped surface envelope, flame radius and
 // a downstream envelope. Returns (shell distance, inside flag, local flame radius, envelope).
 vec4 shellOf(vec3 p) {
+  vec3 q = p;
+  if (uGravity > 0.01 && q.x > X_TIP) {
+    float dxG = q.x - X_TIP;
+    q.y -= uGravity * 0.18 * sqrt(dxG);
+  }
   float rf = R_ROD + uStandoff;
-  float dx = p.x - X_TIP;
-  float n = snoise(vec3(p.x * 6.0 - uTime * (0.6 + 2.0 * uFlowFrac), p.y * 9.0, p.z * 9.0)) * 0.16
-          + snoise(p * 19.0 + uTime * 1.5) * 0.06;
+  float dx = q.x - X_TIP;
+  float flicker = uGravity > 0.01 ? sin(uTime * 14.0) * 0.08 * uGravity : 0.0;
+  float n = snoise(vec3(q.x * 6.0 - uTime * (0.6 + 2.0 * uFlowFrac), q.y * 9.0, q.z * 9.0)) * 0.16
+          + snoise(q * 19.0 + uTime * 1.5) * 0.06 + flicker;
   float d;
   float rLocal = rf;
   float env = 1.0;
   if (dx < 0.0) {
     // upstream cap: the flow pushes the flame closer to the tip
-    d = length(vec3(dx * (1.0 + 1.6 * uFlowFrac), p.y, p.z));
+    d = length(vec3(dx * (1.0 + 1.6 * uFlowFrac), q.y, q.z));
   } else {
     // concurrent flame sleeve along the rod, longer at higher flow, tapering downstream
     float len = 0.18 + 0.9 * uFlowFrac;
-    d = length(p.yz);
+    d = length(q.yz);
     rLocal = mix(rf, R_ROD + 0.35 * uStandoff, smoothstep(0.0, len, dx));
     env = 1.0 - smoothstep(len * 0.7, len, dx);
   }
@@ -204,6 +211,7 @@ export function createFlameMaterial(boxMin: THREE.Vector3, boxMax: THREE.Vector3
       uSoot: { value: 1 },
       uBurning: { value: 0 },
       uMode: { value: 0 },
+      uGravity: { value: 0 },
     },
     transparent: true,
     depthWrite: false,

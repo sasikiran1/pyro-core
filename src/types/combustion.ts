@@ -55,6 +55,8 @@ export interface EngineInput {
   xO2: number
   flowCmS: number
   material: Material
+  /** Planetary gravity in units of Earth g (0 for microgravity, 0.16 for Moon, 0.38 for Mars, 1.0 for Earth). Defaults to 0. */
+  gravity?: number
 }
 
 export interface EngineState {

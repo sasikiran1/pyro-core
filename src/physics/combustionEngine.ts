@@ -17,7 +17,7 @@
 import type { CoolingResult, EngineInput, EngineState, Material, Regime } from '../types/combustion'
 import {
   ACTIVATION_ENERGY, ALPHA_REF, CP_GAS, DA_CRIT, DILUTION, EPS_FLAME, HUGGETT_J_PER_KG_O2, K_AIR, MU_AIR,
-  P_REF_KPA, RHO_REF, R_GAS, ROD_DIAMETER, ROD_RADIUS, SIGMA, T_AMBIENT, U_ANCHOR, U_DIFFUSION,
+  P_REF_KPA, RHO_REF, R_GAS, ROD_DIAMETER, ROD_RADIUS, SIGMA, T_AMBIENT, U_ANCHOR, U_BUOYANT_1G, U_DIFFUSION,
 } from './constants'
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
@@ -158,8 +158,11 @@ export function classify(m: Material, u: number, pKPa: number, x: number): Regim
 export const sootiness = (tf: number) => smoothstep(1400, 1750, tf) // thresholds are illustrative
 
 export function evaluate(inp: EngineInput): EngineState {
-  const { material: m, pressureKPa: p, xO2: x, flowCmS } = inp
-  const u = flowCmS / 100
+  const { material: m, pressureKPa: p, xO2: x, flowCmS, gravity } = inp
+  const g = gravity ?? 0
+  const uBuoy = g > 0 ? U_BUOYANT_1G * Math.sqrt(g) : 0
+  const uForced = flowCmS / 100
+  const u = Math.hypot(uForced, uBuoy)
   const ue = uEff(u)
   const tad = adiabaticT(x)
   const { tf, r, loss } = flameT(tad, p, ue)

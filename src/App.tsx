@@ -16,6 +16,8 @@ import { SIIntelligenceCard } from './components/analytics/SIIntelligenceCard'
 import { ReportModal, download } from './components/export/ReportModal'
 import { ComparisonModal } from './components/export/ComparisonModal'
 import { ScenarioBar, type ScenarioId } from './components/controls/ScenarioBar'
+import { PlanetaryGravityModule } from './components/controls/PlanetaryGravityModule'
+import { FirefightingSandbox } from './components/controls/FirefightingSandbox'
 import { cooling as coolingCurve, evaluate, fieldAt, minimumLimit } from './physics/combustionEngine'
 import { materialById } from './physics/materialDatabase'
 import { ATMOSPHERES, BASS2_PMMA_MIN_O2, T_AMBIENT } from './physics/constants'
@@ -52,10 +54,11 @@ export default function App() {
   const [compareOpen, setCompareOpen] = useState(false)
   const [scenario, setScenario] = useState<ScenarioId | null>(null)
   const [copied, setCopied] = useState(false)
+  const [gravity, setGravity] = useState(0.0)
   const scenarioTimer = useRef<number | null>(null)
 
   const material = materialById(materialId)
-  const input = useMemo(() => ({ pressureKPa, xO2, flowCmS, material }), [pressureKPa, xO2, flowCmS, material])
+  const input = useMemo(() => ({ pressureKPa, xO2, flowCmS, material, gravity }), [pressureKPa, xO2, flowCmS, material, gravity])
   const state = useMemo(() => evaluate(input), [input])
   const lit = ignited && state.burning
 
@@ -119,6 +122,27 @@ export default function App() {
   }, [])
   useEffect(() => () => { if (scenarioTimer.current) window.clearTimeout(scenarioTimer.current) }, [])
 
+  const handleVacuumDump = useCallback(() => {
+    setP(0.1)
+  }, [])
+
+  const handleNitrogenPurge = useCallback(() => {
+    setX(0.04)
+  }, [])
+
+  const handleCo2Blast = useCallback(() => {
+    setFlow(40.0)
+    setX((prev) => Math.min(prev, 0.12))
+  }, [])
+
+  const handleResetCabin = useCallback(() => {
+    setP(START_ATM.pressureKPa)
+    setX(START_ATM.xO2)
+    setFlow(1.5)
+    setGravity(0.0)
+    setIgnited(true)
+  }, [])
+
   const shareLink = useCallback(async () => {
     const q = new URLSearchParams()
     const preset = ATMOSPHERES.find((a) => Math.abs(a.pressureKPa - pressureKPa) < 0.05 && Math.abs(a.xO2 - xO2) < 0.0005)
@@ -158,6 +182,7 @@ export default function App() {
         left={
           <>
             <AtmosphereModule pressureKPa={pressureKPa} xO2={xO2} onChange={(p, x) => { setP(p); setX(x) }} />
+            <PlanetaryGravityModule gravity={gravity} onChange={setGravity} />
             <FlowDamper flowCmS={flowCmS} onChange={setFlow} lit={lit} canIgnite={state.burning}
               onIgnite={() => { setIgnited(true); setOutAt(null) }} />
             <MaterialModule material={material} onChange={(id) => {
@@ -193,7 +218,7 @@ export default function App() {
             <ScenarioBar onRun={runScenario} active={scenario} />
             <div className="card p-0 overflow-hidden relative h-[50vh] min-h-[340px]">
               <DuctViewport3D state={state} flowCmS={flowCmS} mode={mode} rodT={rodT} lit={lit} probe={probeAt}
-                onProbe={(x, y) => setProbeAt({ x, y })} />
+                onProbe={(x, y) => setProbeAt({ x, y })} gravity={gravity} />
               <div className="absolute top-2 left-2"><SpectralToolbar mode={mode} onChange={setMode} /></div>
               <div className="absolute top-2 right-2 hud text-[11px] text-slate-300 bg-deck/85 border border-edge/80 px-2.5 py-1 rounded backdrop-blur max-w-[270px] pointer-events-none text-right">
                 <div className="text-[10px] text-cyan-nasa font-semibold uppercase tracking-wider flex items-center justify-end gap-1.5">
@@ -224,6 +249,12 @@ export default function App() {
                 </div>
               )}
             </div>
+            <FirefightingSandbox
+              onVacuumDump={handleVacuumDump}
+              onNitrogenPurge={handleNitrogenPurge}
+              onCo2Blast={handleCo2Blast}
+              onReset={handleResetCabin}
+            />
             <SIIntelligenceCard input={input} state={state} />
             <EvidencePanel material={material} pressureKPa={pressureKPa} xO2={xO2} />
             <section className="card text-[13px] text-slate-300 leading-relaxed">
