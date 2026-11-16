@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body { overflow-x: hidden; }
+body {
+  background: #07090E;
+  color: #cbd5e1;
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hud { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.panel-title {
+  @apply hud text-[12px] uppercase tracking-[0.18em] text-slate-400 flex items-center gap-2;
+}
+.card { @apply bg-panel border border-edge rounded-lg p-3; }
+.glow-cyan { text-shadow: 0 0 12px rgba(0, 229, 255, 0.45); }
+.src-tag { @apply hud text-[11px] px-1 rounded border; }
+.src-literature { @apply border-slate-600 text-slate-400; }
+.src-model { @apply border-amber-700/70 text-amber-400; }
+
+input[type='range'] { accent-color: #00E5FF; }
+:focus-visible { outline: 2px solid #00E5FF; outline-offset: 2px; }
